@@ -8,11 +8,11 @@ class SongsService {
   }
 
   addSong({
-    title, year, genre, performer, duration, albumid,
+    title, year, genre, performer, duration, albumId,
   }) {
     const id = `song-${nanoid(16)}`;
     const newSong = {
-      id, title, year, genre, performer, duration, albumid,
+      id, title, year, genre, performer, duration, albumId,
     };
     this._songs.push(newSong);
     const isSuccess = this._songs.filter((song) => song.id === id).length > 0;
@@ -40,7 +40,7 @@ class SongsService {
   }
 
   editSongById(id, {
-    title, year, genre, performer, duration, albumid,
+    title, year, genre, performer, duration, albumId,
   }) {
     const index = this._songs.findIndex((song) => song.id === id);
     if (index === -1) {
@@ -53,7 +53,7 @@ class SongsService {
       genre,
       performer,
       duration,
-      albumid,
+      albumId,
     };
   }
 

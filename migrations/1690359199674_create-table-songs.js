@@ -26,14 +26,14 @@ exports.up = (pgm) => {
       type: 'INT',
       notNull: false,
     },
-    albumid: {
+    album_id: {
       type: 'VARCHAR(50)',
       notNull: false,
     },
   });
 
   pgm.sql(`
-  ALTER TABLE songs ADD CONSTRAINT fk_songs_albums FOREIGN KEY (albumid) REFERENCES albums(id);`);
+  ALTER TABLE songs ADD CONSTRAINT fk_songs_albums FOREIGN KEY (album_id) REFERENCES albums(id);`);
 };
 
 exports.down = (pgm) => {

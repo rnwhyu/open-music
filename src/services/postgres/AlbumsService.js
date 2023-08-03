@@ -36,11 +36,17 @@ class AlbumService {
 
   async getSongsInAlbum(id) {
     const query = {
-      text: 'SELECT id, title, performer FROM songs WHERE albumid = $1',
+      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
       values: [id],
     };
-    const result = await this._pool.query(query);
-    return result.rows;
+    try {
+
+      const result = await this._pool.query(query);
+      return result.rows;
+    } catch (e){
+      console.log(e)
+      throw e
+    }
   }
 
   async editAlbumById(id, { name, year }) {
