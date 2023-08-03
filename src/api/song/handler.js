@@ -12,10 +12,10 @@ class SongsHandler {
     try {
       this._validator.validateSongPayload(request.payload);
       const {
-        title = 'untitled', year, genre, performer, duration, albumId,
+        title, year, genre, performer, duration, albumid,
       } = request.payload;
       const songId = await this._service.addSong({
-        title, year: Number(year), genre, performer, duration: Number(duration), albumId,
+        title, year, genre, performer, duration, albumid,
       });
       const response = h.response({
         status: 'success',
@@ -88,11 +88,11 @@ class SongsHandler {
     try {
       this._validator.validateSongPayload(request.payload);
       const {
-        title, year, genre, performer, duration, albumId,
+        title, year, genre, performer, duration, albumid,
       } = request.payload;
       const { id } = request.params;
       await this._service.editSongById(id, {
-        title, year, genre, performer, duration, albumId,
+        title, year, genre, performer, duration, albumid,
       });
       return {
         status: 'success',
