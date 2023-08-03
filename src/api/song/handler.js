@@ -45,12 +45,21 @@ class SongsHandler {
     }
   }
 
-  async getSongsHandler() {
+  async getSongsHandler(request) {
     const songs = await this._service.getSongs();
+    const { title, performer } = request.query;
+    const filteredSongs = songs.filter(
+      (song) => (typeof title !== 'undefined' ? song.title.toLowerCase().includes(title.toLowerCase()) : true)
+      && (typeof performer !== 'undefined' ? song.performer.toLowerCase().includes(performer.toLowerCase()) : true),
+    );
     return {
       status: 'success',
       data: {
-        songs,
+        songs: filteredSongs.map((song) => ({
+          id: song.id,
+          title: song.title,
+          performer: song.performer,
+        })),
       },
     };
   }
