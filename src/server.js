@@ -1,17 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
-const albums = require('./api/album');
-const songs = require('./api/song');
 const ClientError = require('./exceptions/ClientError');
-const SongsService = require('./services/postgres/SongsService');
+
+const albums = require('./api/album');
 const AlbumValidator = require('./validator/album');
 const AlbumService = require('./services/postgres/AlbumsService');
+
+const songs = require('./api/song');
 const SongValidator = require('./validator/song');
+const SongsService = require('./services/postgres/SongsService');
+
+const users = require('./api/user');
+const UserService = require('./services/postgres/UsersService');
+const UserValidator = require('./validator/users');
 
 const init = async () => {
   const songsService = new SongsService();
   const albumService = new AlbumService();
+  const usersService = new UserService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -34,6 +41,13 @@ const init = async () => {
       options: {
         service: songsService,
         validator: SongValidator,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UserValidator,
       },
     },
   ]);

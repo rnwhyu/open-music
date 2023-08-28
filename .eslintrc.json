@@ -11,9 +11,8 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "no-console": "off",
-        "linebreak-style" : "off",
-        "eol-last" :"off",
-        "no-underscore-dangle" : "off"
+        "linebreak-style": "off",
+        "no-underscore-dangle":"off",
+        "no-console":"off"
     }
 }

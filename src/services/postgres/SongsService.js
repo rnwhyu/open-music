@@ -49,7 +49,7 @@ class SongService {
       values: [title, year, genre, performer, duration, albumId, id],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui lagu, ID tidak ditemukan');
     }
   }
@@ -60,7 +60,7 @@ class SongService {
       values: [id],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu gagal dihapus, ID tidak ditemukan');
     }
   }
