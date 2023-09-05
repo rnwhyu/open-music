@@ -5,8 +5,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/InvariantError');
 
 class PlaylistsService {
-  constructor(pActivitiesService) {
+  constructor(pActivitiesService, collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
     this._pActivitiesService = pActivitiesService;
   }
 
@@ -26,11 +27,14 @@ class PlaylistsService {
 
   async getPlaylists(owner) {
     const query = {
-      text: 'SELECT * FROM playlists WHERE owner = $1',
+      text: `SELECT p.* FROM playlists p 
+      LEFT JOIN collaborations c ON c.playlist_id = p.id
+      WHERE p.owner = $1 OR c.user_id = $1
+      GROUP BY p.id`,
       values: [owner],
     };
     const result = await this._pool.query(query);
-    return result;
+    return result.rows;
   }
 
   async verifyPlaylistOwner(id, owner) {
@@ -112,17 +116,20 @@ class PlaylistsService {
       songId, userId, playlistId, action: 'delete',
     });
   }
-  // async verifyPlaylistAccess(playlistId, userId) {
-  //   try {
-  //     await this.verifyPlaylistOwner(playlistId, userId);
-  //   } catch (error) {
-  //     if (error instanceof NotFoundError) {
-  //       throw error;
-  //     }
-  //     try {
-  //       await this._collaborationSe
-  //     }
-  //   }
-  // }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
+  }
 }
 module.exports = PlaylistsService;

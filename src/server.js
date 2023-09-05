@@ -26,10 +26,15 @@ const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PActivitiesService = require('./services/postgres/ActivitiesService');
 const PlaylistValidator = require('./validator/playlists');
 
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaboratorsService');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const init = async () => {
-  const pActivitiesService = new PActivitiesService();
   const songsService = new SongsService();
   const albumService = new AlbumService();
+  const collaborationsService = new CollaborationsService();
+  const pActivitiesService = new PActivitiesService();
   const usersService = new UserService();
   const authenticationsService = new AuthenticationsService();
   const playlistsService = new PlaylistsService();
@@ -100,6 +105,14 @@ const init = async () => {
         playlistsService,
         pActivitiesService,
         validator: PlaylistValidator,
+      },
+    },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        playlistsService,
+        validator: CollaborationsValidator,
       },
     },
   ]);
