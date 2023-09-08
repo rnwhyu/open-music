@@ -37,7 +37,7 @@ const init = async () => {
   const pActivitiesService = new PActivitiesService();
   const usersService = new UserService();
   const authenticationsService = new AuthenticationsService();
-  const playlistsService = new PlaylistsService();
+  const playlistsService = new PlaylistsService(pActivitiesService, collaborationsService);
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -134,7 +134,15 @@ const init = async () => {
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
       });
-      if (process.env.NODE_ENV !== 'production') console.log({ response, request });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('ERROR LOG', {
+          request: {
+            route: request.route,
+            payload: request.payload,
+          },
+          response,
+        });
+      }
       newResponse.code(500);
       return newResponse;
     }

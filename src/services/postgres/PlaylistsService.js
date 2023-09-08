@@ -11,7 +11,7 @@ class PlaylistsService {
     this._pActivitiesService = pActivitiesService;
   }
 
-  async addPlaylist({ name, owner }) {
+  async addPlaylist(name, owner) {
     const id = `playlist-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
     const query = {
@@ -25,13 +25,12 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  async getPlaylists(id) {
+  async getPlaylists({ id }) {
     const query = {
-      text: `SELECT p.* FROM playlists p 
+      text: `SELECT p.id, p.name, u.username FROM playlists p 
       INNER JOIN users u ON p.owner = u.id
       LEFT JOIN collaborations c ON c.playlist_id = p.id
-      WHERE p.owner = $1 OR c.user_id = $1
-      GROUP BY p.id`,
+      WHERE p.owner = $1 OR c.user_id = $1`,
       values: [id],
     };
     const result = await this._pool.query(query);
@@ -90,25 +89,27 @@ class PlaylistsService {
 
   async getSongsInPlaylist(id) {
     const playlistQuery = {
-      text: 'SELECT id, name FROM playlists WHERE id = $1',
+      text: 'SELECT p.id, p.name, u.username FROM playlists p INNER JOIN users u ON p.owner = u.id WHERE p.id = $1',
       values: [id],
     };
-    const songsQuery = {
+    const query = {
       text: `SELECT s.id, s.title, s.performer FROM songs s
       LEFT JOIN songsplaylist sp ON s.id = sp.song_id
       WHERE sp.playlist_id = $1`,
       values: [id],
     };
-    const result = await this._pool.query({
-      ...playlistQuery.rows[0],
-      songs: songsQuery.rows,
-    });
+    const playlistResult = await this._pool.query(playlistQuery);
+    const queryResult = await this._pool.query(query);
+    const result = {
+      ...playlistResult.rows[0],
+      ...queryResult.rows[0],
+    };
     return result;
   }
 
   async deleteSongInPlaylist(songId, playlistId, userId) {
     const query = {
-      text: 'DELETE FROM songsplaylist WHERE song_id =$1 AND playlist_id = $2',
+      text: 'DELETE FROM songsplaylist WHERE song_id =$1 AND playlist_id = $2 RETURNING id',
       values: [songId, playlistId],
     };
     const result = await this._pool.query(query);

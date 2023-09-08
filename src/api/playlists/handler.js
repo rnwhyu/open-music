@@ -26,11 +26,11 @@ class PlaylistsHandler {
   }
 
   async getPlaylistsHandler(request) {
-    const playlist = await this._service.getPlaylists(request.auth.credentials);
+    const playlists = await this._service.getPlaylists(request.auth.credentials);
     return {
       status: 'success',
       data: {
-        playlist,
+        playlists,
       },
     };
   }
@@ -68,7 +68,7 @@ class PlaylistsHandler {
     const playlist = await this._service.getSongsInPlaylist(id);
     return {
       status: 'success',
-      data: playlist,
+      data: { playlist },
     };
   }
 
