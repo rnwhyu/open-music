@@ -1,5 +1,10 @@
 exports.up = (pgm) => {
   pgm.createTable('songsplaylist', {
+    id: {
+      type: 'VARCHAR(50)',
+      notNull: true,
+      primaryKey: true,
+    },
     song_id: {
       type: 'VARCHAR(50)',
       notNull: true,

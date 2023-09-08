@@ -12,6 +12,7 @@ class PlaylistsHandler {
     this._validator.validatePlaylistsPayload(request.payload);
     const { name } = request.payload;
     const { id: credentialId } = request.auth.credentials;
+    // console.log(name, credentialId);
     const playlistId = await this._service.addPlaylist(name, credentialId);
     const response = h.response({
       status: 'success',
@@ -51,7 +52,7 @@ class PlaylistsHandler {
     const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
-    await this._service.addSongToPlaylist(playlistId, songId, credentialId);
+    await this._service.addSongToPlaylist(songId, playlistId, credentialId);
     const response = h.response({
       status: 'success',
       message: 'Lagu berhasil ditambahkan ke Playlist',

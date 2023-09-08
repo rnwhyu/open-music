@@ -13,7 +13,7 @@ class PlaylistActivitiesService {
     const id = `playlistactivity-${nanoid(16)}`;
     const time = new Date().toISOString();
     const query = {
-      text: 'INSERT INTO playlistactivities VALUES($1, $2, $3, $4, $5, $6)',
+      text: 'INSERT INTO playlistactivities VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
       values: [id, songId, userId, playlistId, time, action],
     };
     const result = await this._pool.query(query);

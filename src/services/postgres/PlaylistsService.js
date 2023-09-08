@@ -2,7 +2,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const AuthorizationError = require('../../exceptions/InvariantError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor(pActivitiesService, collaborationService) {
@@ -25,13 +25,14 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  async getPlaylists(owner) {
+  async getPlaylists(id) {
     const query = {
       text: `SELECT p.* FROM playlists p 
+      INNER JOIN users u ON p.owner = u.id
       LEFT JOIN collaborations c ON c.playlist_id = p.id
       WHERE p.owner = $1 OR c.user_id = $1
       GROUP BY p.id`,
-      values: [owner],
+      values: [id],
     };
     const result = await this._pool.query(query);
     return result.rows;
@@ -64,6 +65,7 @@ class PlaylistsService {
   }
 
   async addSongToPlaylist(songId, playlistId, userId) {
+    const id = `sp-${nanoid(16)}`;
     const songQuery = {
       text: 'SELECT * FROM songs WHERE id = $1',
       values: [songId],
@@ -73,21 +75,22 @@ class PlaylistsService {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
     const query = {
-      text: 'INSERT INTO songsplaylist VALUES($1, $2)',
-      values: [songId, playlistId],
+      text: 'INSERT INTO songsplaylist VALUES($1, $2, $3) RETURNING id',
+      values: [id, songId, playlistId],
     };
     const result = await this._pool.query(query);
     if (!result.rowCount) {
       throw new InvariantError('Lagu gagal dimasukkan');
     }
     await this._pActivitiesService.addPlaylistActivities({
-      songId, userId, playlistId, action: 'delete',
+      songId, userId, playlistId, action: 'add',
     });
+    return result.rows[0].id;
   }
 
   async getSongsInPlaylist(id) {
     const playlistQuery = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
+      text: 'SELECT id, name FROM playlists WHERE id = $1',
       values: [id],
     };
     const songsQuery = {

@@ -102,7 +102,7 @@ const init = async () => {
     {
       plugin: playlists,
       options: {
-        playlistsService,
+        service: playlistsService,
         pActivitiesService,
         validator: PlaylistValidator,
       },
@@ -117,7 +117,6 @@ const init = async () => {
     },
   ]);
   server.ext('onPreResponse', (request, h) => {
-    // mendapatkan konteks response dari request
     const { response } = request;
     if (response instanceof Error) {
       if (response instanceof ClientError) {
@@ -135,6 +134,7 @@ const init = async () => {
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
       });
+      if (process.env.NODE_ENV !== 'production') console.log(response);
       newResponse.code(500);
       return newResponse;
     }
