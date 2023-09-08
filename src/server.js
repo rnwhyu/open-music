@@ -134,7 +134,7 @@ const init = async () => {
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
       });
-      if (process.env.NODE_ENV !== 'production') console.log(response);
+      if (process.env.NODE_ENV !== 'production') console.log({ response, request });
       newResponse.code(500);
       return newResponse;
     }
