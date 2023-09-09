@@ -24,9 +24,34 @@ class SongService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
+  async getSongs(request) {
+    const { title, performer } = request;
+    if (title !== undefined && performer !== undefined) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+        values: [`%${title}%`, `%${performer}%`],
+      };
+      const { rows } = await this._pool.query(query);
+      return rows;
+    }
+    if (title) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
+        values: [`%${title}%`],
+      };
+      const { rows } = await this._pool.query(query);
+      return rows;
+    }
+    if (performer) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
+        values: [`%${performer}%`],
+      };
+      const { rows } = await this._pool.query(query);
+      return rows;
+    }
     const result = await this._pool.query('SELECT id, title, performer FROM songs');
-    return result.rows.map(mapDBToSongModel);
+    return result.rows;
   }
 
   async getSongById(id) {
@@ -35,7 +60,7 @@ class SongService {
       values: [id],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
     return result.rows.map(mapDBToSongModel)[0];

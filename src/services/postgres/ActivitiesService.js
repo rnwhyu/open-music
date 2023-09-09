@@ -22,7 +22,7 @@ class PlaylistActivitiesService {
 
   async getActivitiesOnPlaylist(id) {
     const query = {
-      text: `SELECT u.username, s.title, pa.action. pa.time FROM playlistactivities pa 
+      text: `SELECT u.username, s.title, pa.action, pa.time FROM playlistactivities pa 
       LEFT JOIN users u ON pa.user_id = u.id LEFT JOIN songs s on pa.song_id = s.id 
       WHERE pa.playlist_id = $1 ORDER BY pa.time ASC`,
       values: [id],
