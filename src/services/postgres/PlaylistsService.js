@@ -135,5 +135,25 @@ class PlaylistsService {
       }
     }
   }
+
+  async getPlaylistById(id) {
+    const playlistQuery = {
+      text: 'SELECT id, name FROM playlists WHERE id = $1',
+      values: [id],
+    };
+    const query = {
+      text: `SELECT s.id, s.title, s.performer FROM songs s
+      LEFT JOIN songsplaylist sp ON s.id = sp.song_id
+      WHERE sp.playlist_id = $1`,
+      values: [id],
+    };
+    const playlistResult = await this._pool.query(playlistQuery);
+    const queryResult = await this._pool.query(query);
+    const result = {
+      ...playlistResult.rows[0],
+      songs: queryResult.rows,
+    };
+    return result;
+  }
 }
 module.exports = PlaylistsService;
