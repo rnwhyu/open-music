@@ -4,24 +4,19 @@ class StorageService {
   constructor(folder) {
     this._folder = folder;
     if (!fs.existsSync(folder)) {
-      fs.mkdir(folder, { recursive: true });
+      fs.mkdirSync(folder, { recursive: true });
     }
   }
 
   writeFile(file, meta) {
-    const fName = +new Date() + meta.fName;
-    const path = `${this._folder}/${fName}`;
-    const fStream = fs.createWriteStream(path);
+    const filename = +new Date() + meta.filename;
+    const path = `${this._folder}/${filename}`;
+    const fileStream = fs.createWriteStream(path);
     return new Promise((resolve, reject) => {
-      fStream.on('error', (error) => reject(error));
-      file.pipe(fStream);
-      file.on('end', () => resolve(fName));
+      fileStream.on('error', (error) => error(reject));
+      file.pipe(fileStream);
+      file.on('end', () => resolve(filename));
     });
-  }
-
-  deleteFile(fName) {
-    const path = `${this._folder}/${fName}`;
-    return fs.promises.unlink(path);
   }
 }
 module.exports = StorageService;
