@@ -14,9 +14,8 @@ class ExportsHandler {
     const { id: credentialId } = request.auth.credentials;
     const { targetEmail } = request.payload;
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
-    const playlist = await this._playlistsService.getPlaylistById(playlistId);
     const message = {
-      playlist,
+      playlistId,
       targetEmail,
     };
     await this._service.sendMessage('export:playlists', JSON.stringify(message));
